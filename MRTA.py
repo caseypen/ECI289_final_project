@@ -1,16 +1,17 @@
-from __future__ import division
 import numpy as np 
 import matplotlib.pyplot as plt
 from scipy import stats
-# from itertools import groupby
 
-
-verbose = True
+verbose = False
 save = False
-# range (xrange, yrange), N is number of tasks points
-def get_random_tasks(range,N):
-  x = np.random.random(N)*range[0]
-  y = np.random.random(N)*range[1]
+
+''' ################################################## 
+  Generate task points for a certain area
+  range:(xrange, yrange), N is number of tasks points
+'''###################################################
+def get_random_tasks(search_range,N):
+  x = np.random.random(N)*search_range[0]
+  y = np.random.random(N)*search_range[1]
   xy = np.vstack((x,y))
   if verbose:
     print "Tasks points: ", xy
@@ -18,10 +19,19 @@ def get_random_tasks(range,N):
     name = 'task_points-'+str(N)+'.txt'
     np.savetxt(name,xy)
   return xy
+''' ################################################## 
+      Distribute the robots in the task range
+'''###################################################
+def lhs(N,D):
+  grid = np.linspace(0,1,N+1)
+  result = np.random.uniform(low=grid[:-1], high=grid[1:], size=(D,N))
+  for c in result:
+    np.random.shuffle(c)
+  return result
 
-def get_random_robots(range,N):
-  x = np.random.random(N)*range[0]
-  y = np.random.random(N)*range[1]
+def assign_robots(search_range,N):
+  x = lhs(N,1)*search_range[0]
+  y = lhs(N,1)*search_range[1]
   xy = np.vstack((x,y))
   if verbose:
     print "Robots points: ", xy
@@ -29,142 +39,171 @@ def get_random_robots(range,N):
     name = 'task_points-'+str(N)+'.txt'
     np.savetxt(name,xy)
   return xy
-# do the local search:
-def raw_allocation(robots,tasks):
+
+''' ################################################## 
+      Local search: (O(n*logn*m)+O(n**2))
+      Tasks asks help for local robots
+      It can only calls the robots nearsets to them
+'''###################################################
+def raw_allocation(robots,tasks,search_range):
   num_robots = robots.shape[1]
-  num_tasks = tasks.shape[1]
-  dist_c = np.zeros((num_robots,num_tasks))
-  for i in np.arange(num_robots):
-    for j in np.arange(num_tasks):
+  num_tasks  = tasks.shape[1]
+  dist_c = np.zeros((num_robots,num_tasks)) # distance matrix
+
+  for i in range(num_robots):
+    for j in range(num_tasks):
       dist_c[i,j] = np.sqrt(((robots[:,i]-tasks[:,j])**2).sum())
+
   if verbose:
     print dist_c.shape
+  # Each task only need one nearest robot to help
   robot_chosen = np.argmin(dist_c,axis=0)
+
   if verbose:
     print "Each task choose robot:", robot_chosen
-  # [len(list(group)) for key, group in groupby(a)]
+
+  # Task assignment of robots
   robots_tasks = dict()
-  robot_tasks = robots_tasks.fromkeys(range(num_robots),[])
-  for i , robot in enumerate(robot_chosen):
-    for j in np.arange(num_robots):
-      if robot == j:
-        robots_tasks[j].append(i) # each elements means which number of tasks is chosen
+  robots_tasks = {k: [] for k in range(num_robots)}
+  # robots_tasks = robots_tasks.fromkeys(robot_list,[])
+  for i,robot in enumerate(robot_chosen):
+    robots_tasks[robot].append(i) # each elements means which number of tasks is chosen
+
   if verbose:
     print "robot choose tasks:", robots_tasks
-  return robots_tasks
-def distance(robots, tasks):
-  d = robots - tasks  
-  return np.sqrt((d**2).sum(axis=1)).sum()
+  allocation_show(robots,tasks,robots_tasks,search_range)
 
-def task_assignment_solver(num_seeds,max_NFE,tasks,robots):
-  ft = np.zeros((num_seeds, max_NFE))
-  num_tasks = tasks.shape[1]
-  assignment = np.arange(num_tasks)
-  assignt = np.zeros((num_seeds,num_tasks)).astype(int)  
-  for seed in np.arange(num_seeds):
+  return robots_tasks
+''' ################################################## 
+      Local TSP: (Go through robots+task points)
+      Task execution of each robots
+'''###################################################
+def distance(tour, xy):
+  # index with list, and repeat the first city
+  tour = np.append(tour, tour[0])
+  d = np.diff(xy[tour], axis=0) 
+  return np.sqrt((d**2).sum(axis=1)).sum()
+ 
+def OneRobotTask_solver(num_seeds, max_NFE, xy, search_range):
+  # calculate the theoritical minimum of search length
+  num_rtsk = xy.shape[0]
+  search_length = min(search_range)
+  L_star = np.sqrt(num_rtsk)*0.25*search_length
+
+  # time mark of each calculation
+  ft = np.zeros((num_seeds, max_NFE)) 
+  exect = np.arange(num_rtsk)  
+  exectt = np.zeros((num_seeds,num_rtsk)).astype(int)
+
+  # task execution
+  for seed in range(num_seeds):
     np.random.seed(seed)
     # random initial tour
-    assignment = np.random.permutation(assignment)
-    bestf = distance(robots, tasks)
-    for i in np.arange(max_NFE):
-      # mutate the tour using two random cities
-      trial_assignment = np.copy(assignment) # do not operate on original list
-      a,b = np.random.random_integers(num_tasks,size=(2,))
-      # the entire route between two cities are reversed
+    exect = np.random.permutation(exect)
+    bestf = 99999
+    n = 0
+    while n < max_NFE and bestf > L_star:
+    # mutate the tour using two random cities
+      trial_exect = np.copy(exect) # do not operate on original list
+      a = np.random.randint(num_rtsk)
+      b = np.random.randint(num_rtsk)
+    # the entire route between two cities are reversed
       if a > b:
         a,b = b,a
-        trial_assignment[a:b+1] = trial_assignment[a:b+1][::-1]
-      tasks[0] = tasks[1][assignment]
-      tasks[1] = tasks[1][assignment]
-      trial_f = distance(robots, tasks)
-      if trial_f < bestf:
-        assignment = trial_assignment
-        bestf = trial_f
-      ft[seed,i] = bestf
-      assignt[seed] = assignment
-    print assignment
-    print bestf
-  best_ind = np.unravel_index(ft.argmin(), ft.shape)
-  bestf = ft[best_ind]
-  bestassign = assignt[best_ind[0]]
-  return bestassign,bestf,assignt,ft # best result of all seeds
+        trial_exect[a:b+1] = trial_exect[a:b+1][::-1]
 
-def assignment_show(robots,tasks,assignt,ft):
-  plt.subplot(1,2,1)
-  # tour = np.append(tour, tour[0]) # for plotting
-  # tasks = tasks[assignt]
-  plt.scatter(robots[0,:], robots[1,:], marker='o', color="r",alpha=0.3)
-  plt.scatter(tasks[1,:],tasks[1,:], marker='*',color="b",alpha=0.5)
-  for i, assign in enumerate(assignt):
-    plt.plot([robots[0][i],tasks[0][assign]],[robots[1][i],tasks[1][assign]])
-  # plt.plot(robots[:,0], robots[:,1])
-  # plt.plot(tasks[:,0],tasks[:,1], marker='*')
-  plt.subplot(1,2,2)
-  plt.semilogx(ft.T, color='steelblue', linewidth=1)
-  plt.xlabel('Iterations')
-  plt.ylabel('Length of Tour')
+      trial_f = distance(trial_exect, xy)
+
+      if trial_f < bestf:
+        exect = trial_exect
+        bestf = trial_f
+      ft[seed,n] = bestf
+      n += 1
+      exectt[seed] = exect
+  # print exect
+  # print bestf
+  best_ind = np.unravel_index(np.argmin(np.nonzero(ft)), ft.shape)
+  bestf = ft[best_ind]
+  bestexect = exectt[best_ind[0]]
+  
+  return bestexect,bestf,ft # best result of all seeds
+
+''' ################################################## 
+      Global TSP: summary of all robots execution
+      Task execution of all robots
+'''###################################################
+def MRTA_Solver(robots,tasks,num_seeds,max_NFE,search_range):
+  robots_tasks = raw_allocation(robots,tasks,search_range) # robot task assignment
+  
+  # change task assignment to points coordinates
+  MRTA_EXE = np.zeros(robots.shape[1])
+  MRTA_tour = dict()
+  MRTA_tour = {k: [] for k in range(robots.shape[1])}
+  for i in range(robots.shape[1]):
+    if verbose:
+      print robots[:,i].shape
+      print tasks[:,robots_tasks[i]].shape
+    OneRobotTask = np.vstack((robots[:,i].T,tasks[:,robots_tasks[i]].T))
+    # print OneRobotTask
+  # find best tour and shortest distance for each robot
+    besttour, bestf, ft = OneRobotTask_solver(num_seeds,max_NFE,OneRobotTask,search_range)
+  # Mark all the robots execution
+    MRTA_tour[i] = OneRobotTask[besttour,:]
+    MRTA_EXE[i] = bestf
+    
+    print "%d of %d robot executing tasks" %(i+1 , robots.shape[1])
+    print "Task assignments", robots_tasks[i]
+    print "Running distances", MRTA_EXE[i]
+    
+  # print MRTA_tour
+  if save:
+    filename = "MRTA_tour.npy"
+    np.save(filename,MRTA_tour)
+    print MRTA_tour
+
+  return MRTA_tour, MRTA_EXE
+''' #################################################### 
+      Visualizations of task assignment and execution
+'''#####################################################
+
+def exect_map_show(MRTA_tour,robots,tasks,search_range):
+  # plt.subplot(1,1,1)
+  color_arr = color_produce(robots)
+  for i in range(robots.shape[1]):
+    MRTA_tour[i] = np.vstack((MRTA_tour[i], MRTA_tour[i][0])) # for plotting
+    # print MRTA_tour[i]
+    plt.plot(MRTA_tour[i][:,0], MRTA_tour[i][:,1], marker='o', color=color_arr[i,:])
   plt.show()
 
+def color_produce(robots):
+  np.random.seed(0)
+  robot_num = robots.shape[1]
+  color_arr = np.random.rand(robot_num,3)
 
-# # def TSP_NFE_Show(savename,num_seeds,N):
-# #   NFEt= np.loadtxt(savename)
-# # # B = np.loadtxt('bfgs-scaling-results.txt')
-  
-# #   x = np.tile(N,(10,1)).reshape(50,)
-# #   y = NFEt.reshape(50,)
+  return color_arr
+def allocation_show(robots,tasks,robots_tasks,search_range):
+	# plt.scatter(robots[0,:], robots[1,:], marker='o', color="r",alpha=0.3)
+  color_arr = color_produce(robots)
+  plt.subplot(1,1,1)
+  for i in range(robots.shape[1]):
+    color_r = color_arr[i,:]
+    r_label = 'robots'+str(i+1)
+    rt_label = r_label+'\'s tasks'
+    plt.scatter(robots[0][i], robots[1][i], marker='*', color=color_r,s=200,label=r_label)
+    # plt.scatter(tasks[:,robots_tasks[i]][0,:],tasks[:,robots_tasks[i]][1,:],marker='o',color = color_r, label=rt_label)
+  plt.legend(loc='center left',bbox_to_anchor=(0.9, 0.5))
+	# plt.show()
 
-# #   slope,intercept,rvalue,pvalue,stderr = stats.linregress(x,y)
-# #   plt.subplot(1,2,1)
-# #   plt.scatter(x,y)
-# #   # print slope
-# #   plt.plot([np.min(x), np.max(x)], [intercept + np.min(x)*slope, intercept + np.max(x)*slope], 
-# #             color='indianred', linewidth=2)
-# #   # plt.text(250,120000, 'slope = %0.2f' % slope, fontsize=16)
-# #   plt.xlabel('# Decision Variables')
-# #   plt.ylabel('NFE to converge')
-# #   plt.title('TSP Problem (slope:' + str(np.round(slope,2))+')')
-
-
-#   x_log = np.log10(x)
-#   y_log = np.log10(y)
-#   slope,intercept,rvalue,pvalue,stderr = stats.linregress(x_log,y_log)
-#   plt.subplot(1,2,2)
-#   plt.scatter(x_log,y_log)
-#   plt.plot([np.min(x_log), np.max(x_log)], [intercept + np.min(x_log)*slope, intercept + np.max(x_log)*slope], 
-#             color='indianred', linewidth=2)
-#   # plt.text(250,120000, 'slope = %0.2f' % slope, fontsize=16)
-#   plt.xlabel('log(# Decision Variables)')
-#   plt.ylabel('log(NFE to converge)')
-#   plt.title('TSP Loglog (slope'+ str(np.round(slope,2))+', intercept'+str(np.round(intercept,2))+')')
-
-#   plt.show()
-
-# for large number of evaluation
-"""
-num_seeds = 10
-max_NFE = 10000
-# num_cities = 47
-# L_conv = np.round(np.sqrt(2*num_cities))
-# xy = get_random_cities(num_cities)
-xy = np.loadtxt('tsp-48.txt')
-tour, bestf, ft = TSP_solver_max(num_seeds,max_NFE,xy)
-print tour 
-print bestf
-TSP_show(xy,tour,ft)
-
-"""
 # NFE to different cities
 num_robots = 10 # tasks equal to num of robots
-num_tasks = 15
-range = [10,10]
+num_tasks = 300
+search_range = [10,10]
 num_seeds = 10
 max_NFE = 10000
-robots = get_random_robots(range,num_robots)
-tasks = get_random_tasks(range,num_tasks)
+robots = assign_robots(search_range,num_robots)
+tasks = get_random_tasks(search_range,num_tasks)
 
-robots_tasks = raw_allocation(robots,tasks)
+# robots_tasks = raw_allocation(robots,tasks,search_range)
+MRTA_tour, MRTA_EXE = MRTA_Solver(robots,tasks,num_seeds,max_NFE,search_range)
+exect_map_show(MRTA_tour,robots,tasks, search_range)
 
-# bestassign,bestf,assignt,ft = task_assignment_solver(num_seeds,max_NFE,tasks,robots)
-# print "Best assignment:", bestassign
-
-# assignment_show(robots,tasks,bestassign,ft)
