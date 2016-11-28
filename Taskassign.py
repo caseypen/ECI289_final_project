@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np 
 import matplotlib.pyplot as plt
 from scipy import stats
+import itertools
 
 verbose = True
 save = False
@@ -32,18 +33,38 @@ def distance(robots, tasks):
   d = robots - tasks  
   return np.sqrt((d**2).sum(axis=1)).sum()
 
-def task_assignment_solver(num_seeds,max_NFE,tasks,robots):
-  ft = np.zeros((num_seeds, max_NFE))
+def exhaustive_all(robots, tasks):
+  tasks_copy = np.copy(tasks)
+  assignments = range(robots.shape[1])
+  best_dist = distance(robots,tasks)
+  for assign in itertools.permutations(assignments):
+    assign = np.array(list(assign))
+    # print assign
+    tasks_copy[0] = tasks_copy[1][assign]
+    tasks_copy[1] = tasks_copy[1][assign]
+    dist = distance(robots,tasks_copy)
+    if dist < best_dist:
+      best_dist = dist
+      best_assign = assign
+
+  return best_dist, best_assign
+
+def task_assignment_solver(num_seeds,max_NFE,tasks,robots, best_dist):
+  # ft = np.zeros((num_seeds, max_NFE))
+  ft = []
   tasks_copy = np.copy(tasks)
   num_tasks = tasks_copy.shape[1]
   assignment = np.arange(num_tasks)
   assignt = np.zeros((num_seeds,num_tasks)).astype(int)  
+  max_NFE *= num_tasks/50
   for seed in np.arange(num_seeds):
     np.random.seed(seed)
     # random initial tour
     assignment = np.random.permutation(assignment)
     bestf = distance(robots, tasks_copy)
-    for i in np.arange(max_NFE):
+    i = 1
+    # for i in np.arange(max_NFE):
+    while i <= max_NFE and bestf > best_dist:
       # mutate the tour using two random cities
       trial_assignment = np.copy(assignment) # do not operate on original list
       a,b = np.random.random_integers(num_tasks,size=(2,))
@@ -57,11 +78,14 @@ def task_assignment_solver(num_seeds,max_NFE,tasks,robots):
       if trial_f < bestf:
         assignment = trial_assignment
         bestf = trial_f
-      ft[seed,i] = bestf
+      # ft[seed,i] = bestf
+      ft.append(bestf)
+      i += 1
       assignt[seed] = assignment
     print assignment
     print bestf
-  best_ind = np.unravel_index(ft.argmin(), ft.shape)
+  ft = np.array(ft)
+  best_ind = np.unravel_index(np.argmin(np.nonzero(ft)), ft.shape)
   bestf = ft[best_ind]
   bestassign = assignt[best_ind[0]]
   return bestassign,bestf,assignt,ft # best result of all seeds
@@ -81,7 +105,7 @@ def assignment_show(robots,tasks,assignt,ft):
   plt.show()
 
 # NFE to different cities
-num = 100 # tasks equal to num of robots
+num = 8 # tasks equal to num of robots
 search_range = [20,20]
 num_seeds = 10
 max_NFE = 100000
@@ -89,6 +113,10 @@ max_NFE = 100000
 robots = get_random_robots(search_range,num)
 tasks  =  get_random_tasks(search_range,num)
 
-bestassign,bestf,assignt,ft = task_assignment_solver(num_seeds,max_NFE,tasks,robots)
+best_dist, best_assign_theory = exhaustive_all(robots, tasks)
+print "The theory best value is", best_dist
+print "The best assginment is", best_assign_theory
+
+bestassign,bestf,assignt,ft = task_assignment_solver(num_seeds,max_NFE,tasks,robots,best_dist)
 
 assignment_show(robots,tasks,bestassign,ft)
