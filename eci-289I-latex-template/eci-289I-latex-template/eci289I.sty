@@ -1,0 +1,324 @@
+%%%% iEMSs 2012 Stylesheet.
+%%%%
+%%%% Copy the iemss.sty file in the main latex file directory
+%%%% The source of the LaTeX file should start with
+%%%%
+%%%% 1/ LaTeX2e:
+%%%%      \documentclass[a4paper]{article}
+%%%%      \usepackage{times}
+%%%%      \usepackage{iemss}
+%%%%
+%%%% 2/ LaTeX:
+%%%%      \documentstyle[a4paper,times]{article}
+%%%%      \input{iemss}
+
+\renewcommand{\abstractname}{Abstract:}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Table}
+\newif\if@haskeywords             % If keywords: do not omit rules
+
+% SIDE MARGINS:
+\oddsidemargin  0mm              % Left margin on odd-numbered pages.
+\evensidemargin  0mm              % Left margin on even-numbered pages.
+
+% VERTICAL SPACING:
+\topmargin      25mm              % Nominal distance from top of page to top
+                                  % of box containing running head.
+\headheight     13mm              % No running headline, and no
+\headsep        21pt              % space between running headline and text.
+\footskip       30pt              % Baseline-baseline distance between
+                                  % running footline and last line of text.
+
+% DIMENSION OF TEXT:
+\textheight 23.2cm                 % Height of text part of page
+\textwidth 13.65cm                  % Width of text part of page, i.e of line
+\hoffset 0.5cm
+\voffset 0.5cm
+
+%\columnsep 1cm                   % Horizontal space between columns
+%\columnseprule 0pt                % No vertical rule between columns
+
+% PARAGRAPHING
+\parskip 1pc %\@plus 1\p@          % Extra vertical space between paragraphs.
+%\parskip 0pt                      % No extra vertical space between paragraphs.
+\parindent 0mm                     % Width of paragraph indentation.
+
+% SECTIONAL UNITS:
+\newdimen\@bls                    % \@b(ase)l(ine)s(kip)
+\@bls=\baselineskip               % \@bls ~= \baselineskip for \normalsize
+\advance\@bls -1ex                % (fudge term)
+\newdimen\@eps                    %
+\@eps=0.0001pt                    % \eps = very small positive quantity
+\newdimen\@blsAdd                 % \@b(ase)l(ine)s(kip) Address
+\@blsAdd=2mm
+
+%\def\section{\@startsection{section}{1}{\z@}
+%  {1.5\@bls plus 0.5\@bls}{1\@bls}{\normalsize\bf}}
+%\def\subsection{\@startsection{subsection}{2}{\z@}
+%  {1\@bls plus 0.25\@bls}{\@eps}{\normalsize\bf}}
+%\def\subsubsection{\@startsection{subsubsection}{3}{\z@}
+%  {1\@bls plus 0.25\@bls}{\@eps}{\normalsize\bf}}
+%\def\paragraph{\@startsection{paragraph}{4}{\parindent}
+%  {1\@bls plus 0.25\@bls}{0.5em}{\normalsize\bf}}
+%\def\subparagraph{\@startsection{subparagraph}{4}{\parindent}
+%  {1\@bls plus 0.25\@bls}{0.5em}{\normalsize\bf}}
+%
+%\def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdepth
+%  \def\@svsec{}\else
+%  \refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname.\hskip0.5em}\fi
+%  \@tempskipa #5\relax
+%  \ifdim \@tempskipa>\z@
+%    \begingroup
+%      #6\relax
+%      \@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M #8\par}%
+%    \endgroup
+%    \csname #1mark\endcsname{#7}\addcontentsline
+%      {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+%        \protect\numberline{\csname the#1\endcsname}\fi #7}%
+%  \else
+%    \def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+%      {#7}\addcontentsline{toc}{#1}{\ifnum #2>\c@secnumdepth \else
+%        \protect\numberline{\csname the#1\endcsname}\fi #7}}%
+%  \fi \@xsect{#5}}
+%
+% FIGURES AND TABLES
+%\long\def\@makefigurecaption#1#2{\vskip 10mm #1. #2\par}
+%
+%\long\def\@maketablecaption#1#2{\hbox to \hsize{\parbox[t]{\hsize}
+%  {#1 \\ #2}}\vskip 0.3ex}
+%
+%\def\fnum@figure{Figure \thefigure}
+%\def\figure{\let\@makecaption\@makefigurecaption \@float{figure}}
+%\@namedef{figure*}{\let\@makecaption\@makefigurecaption \@dblfloat{figure}}
+%
+%% \def\fnum@table{Table \thetable}
+%\def\table{\let\@makecaption\@maketablecaption \@float{table}}
+%\@namedef{table*}{\let\@makecaption\@maketablecaption \@dblfloat{table}}
+%
+\floatsep 10mm plus 4pt minus 4pt % Space between adjacent floats moved
+                                  % to top or bottom of text page.
+\textfloatsep=\floatsep           % Space between main text and floats
+                                  % at top or bottom of page.
+\intextsep=\floatsep              % Space between in-text figures and
+                                  % text.
+
+% FOOTNOTE
+\long\def\@makefntext#1{\parindent 1em\noindent\hbox{${}^{\@thefnmark}$}#1}
+
+% EQUATION
+%\mathindent=0em
+
+% TITLE
+\def\maketitle{\begingroup        % Initialize generation of front-matter
+%   \let\thanks\@gobble
+    \def\thefootnote{\fnsymbol{footnote}}%
+    \newpage \global\@topnum\z@
+    \@maketitle \@thanks
+  \endgroup
+  \let\maketitle\relax \let\@maketitle\relax
+  \gdef\@thanks{}\let\thanks\relax
+  \gdef\@address{}\gdef\@author{}\gdef\@title{}\let\address\relax}
+
+\def\justify@on{\let\\=\@normalcr
+  \leftskip\z@ \@rightskip\z@ \rightskip\@rightskip}
+
+% This defines the header of the first page
+\def\@IEMSSfirstHeader{
+\begin{flushright}{\footnotesize \sl
+ECI 289I Term Paper\\
+UC Davis\\
+}
+\end{flushright}
+}
+
+
+
+
+
+\newbox\fm@box                    % Box to capture front-matter in
+\def\@maketitle{%                 % Actual formatting of \maketitle
+  \global\setbox\fm@box=\vbox\bgroup
+\vspace*{-4cm}
+\thispagestyle{empty}
+\@IEMSSfirstHeader
+    \vskip 8mm                    % 930715: 8mm white space above title
+    \raggedright                  % Front-matter text is ragged right
+    \hyphenpenalty\@M             % and is not hyphenated.
+    {\centering\rmfamily\fontsize{18pt}{20}\bfseries\selectfont\@title\par} % Title set in larger font. CENTERED
+    \vskip\@bls                   % One line of vertical space after title.
+    {\centering{\bf\normalsize        % each author set in the normal CENTERED
+    \@author} \par                 % typeface size
+    \vskip\@bls                   % One line of vertical space after author(s).
+    \@address                     % all addresses
+    \vskip 1cm}
+  \egroup
+ % \twocolumn[%                    % Front-matter text is over 2 columns.
+    \unvbox\fm@box                % Unwrap contents of front-matter box
+    \vskip\@bls                   % add 1 line of vertical space,
+    \unvbox\abstract@box          % unwrap contents of abstract boxes,
+  \if@haskeywords                 % IF keywords THEN
+    \vskip \@overkeywordskip
+    \unvbox\t@keyword             % Keyword, if any
+  \fi                             % FI
+    \vskip 2pc
+%]
+}                  % and add 2pc of vertical space
+
+% ADDRESS:
+\newcounter{address}
+\def\theaddress{\alph{address}}
+\def\@makeadmark#1{\hbox{$^{\rm #1}$}}
+
+\def\address{%
+    \stepcounter{address}\addressmark
+  \@ifnextchar[\@markaddress\@addtoaddress}
+\def\@markaddress[#1]{%
+  \expandafter\xdef\csname mkad@#1\endcsname{\theaddress}%
+  \@addtoaddress}
+\def\@addtoaddress#1{\begingroup
+  \xdef\@tempa{\theaddress}\let\\=\relax
+  \def\protect{\noexpand\protect\noexpand}\xdef\@address{\@address
+  \protect\addresstext{\@tempa}{#1}}\endgroup}
+\def\@address{}
+
+\def\addressmark{\@ifnextchar[\@markedaddressmark
+  {\xdef\@tempb{\theaddress}\@makeadmark{\@tempb}}}
+\def\@markedaddressmark[#1]{\xdef\@tempb{\csname mkad@#1\endcsname}%
+  \@makeadmark{\@tempb}}
+
+\def\addresstext#1#2{\leavevmode \begingroup
+  \raggedright \centering \hyphenpenalty\@M \@makeadmark{#1}#2 \vskip -5mm\par
+\endgroup
+%make addresses CENTERED
+  \vskip\@bls}
+% ABSTRACT:
+\newbox\abstract@box              % Box to capture abstract in
+
+\def\abstract{%
+  \global\setbox\abstract@box=\vbox\bgroup
+  \normalsize\rm
+  \ignorespaces{\bf{\abstractname}}}
+\def\endabstract{\par \egroup}
+
+% KEYWORDS
+\def\@overkeywordskip{10\p@}      % Keyword skip.
+\def\@keywordsize{\normalsize\rm}         % Keyword size.
+\def\@keywordheading{{\bf{\emph{Keywords:}}}}
+\def\@keywordwidth{.8\textwidth}
+\newbox\t@keyword                 % Box for keyword abstract
+
+\def\keyword{%
+  \global\@haskeywordstrue             % Implies rules are to be printed
+  %\hyphenpenalty\sv@hyphenpenalty      % restore \hyphenpenalty
+  \def\sep{\unskip; }                  % separator for multiple keywords
+  %\def\MSC{\par\leavevmode\hbox {\it 1991 MSC:\ }}%
+  %\def\PACS{\par\leavevmode\hbox {\it PACS:\ }}%
+  \global\setbox\t@keyword=\vbox\bgroup
+  \@keywordsize
+  \parskip\z@
+  \vskip 10\p@ \@plus 2\p@ \@minus 2\p@       % One line of space above keywords.
+  \noindent\@keywordheading
+  %\justify@off                         % Keywords are not justified.
+  %\ignorespaces
+  }
+\def\endkeyword{\par \egroup}
+
+% BIBLIOGRAPHY
+%\def\thebibliography#1{\section*{REFERENCES}\list{\arabic{enumi}.}
+%  {\settowidth\labelwidth{#1.}\leftmargin=1.67em
+%   \labelsep\leftmargin \advance\labelsep-\labelwidth
+%   \itemsep\z@ \parsep\z@
+%   \usecounter{enumi}}\def\makelabel##1{\rlap{##1}\hss}%
+%   \def\newblock{\hskip 0.11em plus 0.33em minus -0.07em}
+%   \sloppy \clubpenalty=4000 \widowpenalty=4000 \sfcode`\.=1000\relax}
+%
+% Collapse citation numbers to ranges.
+\newcount\@tempcntc
+%\def\@citex[#1]#2{\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi
+%  \@tempcnta\z@\@tempcntb\m@ne\def\@citea{}\@cite{\@for\@citeb:=#2\do
+%    {\@ifundefined
+%       {b@\@citeb}{\@citeo\@tempcntb\m@ne\@citea
+%        \def\@citea{,\penalty\@m\ }{\bf ?}\@warning
+%       {Citation `\@citeb' on page \thepage \space undefined}}%
+%    {\setbox\z@\hbox{\global\@tempcntc0\csname b@\@citeb\endcsname\relax}%
+%     \ifnum\@tempcntc=\z@ \@citeo\@tempcntb\m@ne
+%       \@citea\def\@citea{,\penalty\@m}
+%       \hbox{\csname b@\@citeb\endcsname}%
+%     \else
+%      \advance\@tempcntb\@ne
+%      \ifnum\@tempcntb=\@tempcntc
+%      \else\advance\@tempcntb\m@ne\@citeo
+%      \@tempcnta\@tempcntc\@tempcntb\@tempcntc\fi\fi}}\@citeo}{#1}}
+
+%\def\@citeo{\ifnum\@tempcnta>\@tempcntb\else\@citea
+%  \def\@citea{,\penalty\@m}%
+%  \ifnum\@tempcnta=\@tempcntb\the\@tempcnta\else
+%   {\advance\@tempcnta\@ne\ifnum\@tempcnta=\@tempcntb \else
+%\def\@citea{--}\fi
+%    \advance\@tempcnta\m@ne\the\@tempcnta\@citea\the\@tempcntb}\fi\fi}
+%
+% PAGE STYLES
+%\def\ps@crcplain{\let\@mkboth\@gobbletwo
+%     \def\@oddhead{\reset@font{\sl\rightmark}\hfil \rm\thepage}%
+%     \def\@evenhead{\reset@font\rm \thepage\hfil\sl\leftmark}%
+%     \let\@oddfoot\@empty
+%     \let\@evenfoot\@oddfoot}
+
+%\def\rightmark{KKK}
+
+% \def\ps@headings{%
+%     \let\@oddfoot\@empty
+%     \def\@oddhead{{\slshape\rightmark}\hfil \rightmark}%
+%     \let\@mkboth\markboth
+%     \def\sectionmark##1{%
+%       \markright {\MakeUppercase{%
+%         \ifnum \c@secnumdepth >\m@ne
+%           \thesection\quad
+%         \fi
+%         ##1}}}}
+
+\newcommand{\IEMSShead}[1]{\def\@defheading{#1}}
+
+\def\ps@IEMSSheadings{%
+    \let\@oddfoot\@empty\let\@evenfoot\@empty
+    \def\@evenhead{ZZ \hfil\slshape\leftmark}%
+%    \def\@oddhead{{\@defheading} }%
+    \def\@oddhead{{\hfil\footnotesize\slshape\@defheading\hfil}}%
+    \let\@mkboth\@gobbletwo
+    \let\sectionmark\@gobble
+    \let\subsectionmark\@gobble
+    }
+
+% INITIALIZATION
+% \twocolumn                    % Formatting is in 2 columns given by maketitle, with
+\sloppy                         % paragraphs that can be loosely set,
+\emergencystretch=1pc           % (with 1 pc extra for emergencies),
+\flushbottom                    % and pages of equal length
+
+\oddsidemargin 5.9mm
+\evensidemargin 0.9mm
+\topmargin      0mm
+\headheight     0mm
+\headsep        1cm
+
+\pagestyle{empty}
+%\makeatletter
+\def\@normalsize{\@setsize\normalsize{10pt}\xpt\@xpt
+\abovedisplayskip 10pt plus2pt minus5pt\belowdisplayskip
+\abovedisplayskip \abovedisplayshortskip \z@
+plus3pt\belowdisplayshortskip 6pt plus3pt
+minus3pt\let\@listi\@listI}
+\def\section{\@startsection {section}{1}{\z@}
+        {-2ex plus -.2ex minus -.2ex}{1ex plus .2ex}
+        {\bf\textsc}}
+\def\subsection{\@startsection {subsection}{2}{\z@}
+        {-2ex plus -.2ex minus -.2ex}{1ex plus .2ex}
+        {\bf}}
+\renewcommand{\subsubsection}[1]{\paragraph*{\bf #1.}}
+\def\paragraph{\@startsection {paragraph}{4}{\z@}
+        {-1ex plus -.2ex minus -.2ex}{-1em}
+        {\normalsize\bf}}
+\def\subparagraph{\@startsection {subparagraph}{4}{\parindent}
+        {-1ex plus -.2ex minus -.2ex}{-1em}
+        {\normalsize\bf}}
+\makeatother

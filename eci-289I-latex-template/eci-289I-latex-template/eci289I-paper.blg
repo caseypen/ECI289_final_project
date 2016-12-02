@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: eci289I-paper.aux
+The style file: eci289I.bst
+Database file #1: eci289I-refs.bib
+You've used 3 entries,
+            2747 wiz_defined-function locations,
+            612 strings with 5052 characters,
+and the built_in function-call counts, 1488 in all, are:
+= -- 148
+> -- 50
+< -- 6
++ -- 23
+- -- 15
+* -- 97
+:= -- 241
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 16
+chr.to.int$ -- 3
+cite$ -- 3
+duplicate$ -- 70
+empty$ -- 118
+format.name$ -- 22
+if$ -- 325
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 4
+newline$ -- 19
+num.names$ -- 12
+pop$ -- 25
+preamble$ -- 1
+purify$ -- 14
+quote$ -- 0
+skip$ -- 64
+stack$ -- 0
+substring$ -- 90
+swap$ -- 21
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 28
+warning$ -- 0
+while$ -- 14
+width$ -- 0
+write$ -- 42

@@ -1,0 +1,21 @@
+\begin{thebibliography}{3}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[Author(1989)]{churchman:itor}
+Author, A.
+\newblock {\em About Randomness and Thinking}, chapter Randomly thinking about
+  something, pages 76--121.
+\newblock Random Publishers, 1989.
+
+\bibitem[Author and Author(1992)]{hanke:dfwudc}
+Author, A. and B.~Author.
+\newblock Random thoughts.
+\newblock {\em Some Journal}, 9:\penalty0 275--308, 1992.
+
+\bibitem[Author and Author(1991)]{berry:teomowcihbsi}
+Author, A. and C.~Author.
+\newblock Random by chance.
+\newblock In {\em Proceedings of Random Thoughts PRT 2001}, pages 591--595,
+  1991.
+
+\end{thebibliography}
