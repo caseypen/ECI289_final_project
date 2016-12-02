@@ -190,20 +190,21 @@ def allocation_show(robots,tasks,robots_tasks,search_range):
     r_label = 'robots'+str(i+1)
     rt_label = r_label+'\'s tasks'
     plt.scatter(robots[0][i], robots[1][i], marker='*', color=color_r,s=200,label=r_label)
-    # plt.scatter(tasks[:,robots_tasks[i]][0,:],tasks[:,robots_tasks[i]][1,:],marker='o',color = color_r, label=rt_label)
+    plt.scatter(tasks[:,robots_tasks[i]][0,:],tasks[:,robots_tasks[i]][1,:],marker='o',color = color_r, label=rt_label)
   plt.legend(loc='center left',bbox_to_anchor=(0.9, 0.5))
-	# plt.show()
+  # plt.show() 
 
 # NFE to different cities
 num_robots = 10 # tasks equal to num of robots
 num_tasks = 300
 search_range = [10,10]
 num_seeds = 10
-max_NFE = 10000
+max_NFE = 100000
 robots = assign_robots(search_range,num_robots)
 tasks = get_random_tasks(search_range,num_tasks)
 
-# robots_tasks = raw_allocation(robots,tasks,search_range)
-MRTA_tour, MRTA_EXE = MRTA_Solver(robots,tasks,num_seeds,max_NFE,search_range)
-exect_map_show(MRTA_tour,robots,tasks, search_range)
+robots_tasks = raw_allocation(robots,tasks,search_range)
+allocation_show(robots,tasks,robots_tasks,search_range)
+# MRTA_tour, MRTA_EXE = MRTA_Solver(robots,tasks,num_seeds,max_NFE,search_range)
+# exect_map_show(MRTA_tour,robots,tasks, search_range)
 
