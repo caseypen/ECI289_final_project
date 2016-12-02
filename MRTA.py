@@ -205,6 +205,6 @@ tasks = get_random_tasks(search_range,num_tasks)
 
 robots_tasks = raw_allocation(robots,tasks,search_range)
 allocation_show(robots,tasks,robots_tasks,search_range)
-# MRTA_tour, MRTA_EXE = MRTA_Solver(robots,tasks,num_seeds,max_NFE,search_range)
-# exect_map_show(MRTA_tour,robots,tasks, search_range)
+MRTA_tour, MRTA_EXE = MRTA_Solver(robots,tasks,num_seeds,max_NFE,search_range)
+exect_map_show(MRTA_tour,robots,tasks, search_range)
 
