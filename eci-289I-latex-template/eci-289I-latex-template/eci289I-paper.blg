@@ -5,45 +5,45 @@ The style file: eci289I.bst
 Database file #1: eci289I-refs.bib
 Warning--to sort, need author or key in wikiwebTSP
 Warning--there's a number but no volume in sedighpour2012effective
-You've used 3 entries,
+You've used 6 entries,
             2747 wiz_defined-function locations,
-            611 strings with 5288 characters,
-and the built_in function-call counts, 1163 in all, are:
-= -- 118
-> -- 48
-< -- 1
-+ -- 24
-- -- 15
-* -- 92
-:= -- 197
-add.period$ -- 8
-call.type$ -- 3
-change.case$ -- 17
-chr.to.int$ -- 3
-cite$ -- 7
-duplicate$ -- 43
-empty$ -- 87
-format.name$ -- 19
-if$ -- 235
+            636 strings with 5838 characters,
+and the built_in function-call counts, 2397 in all, are:
+= -- 244
+> -- 104
+< -- 3
++ -- 51
+- -- 33
+* -- 187
+:= -- 421
+add.period$ -- 18
+call.type$ -- 6
+change.case$ -- 35
+chr.to.int$ -- 6
+cite$ -- 10
+duplicate$ -- 92
+empty$ -- 173
+format.name$ -- 40
+if$ -- 478
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 2
-newline$ -- 18
-num.names$ -- 8
-pop$ -- 20
+missing$ -- 6
+newline$ -- 34
+num.names$ -- 20
+pop$ -- 36
 preamble$ -- 1
-purify$ -- 14
+purify$ -- 29
 quote$ -- 0
-skip$ -- 39
+skip$ -- 79
 stack$ -- 0
-substring$ -- 55
-swap$ -- 4
+substring$ -- 117
+swap$ -- 7
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 33
+type$ -- 61
 warning$ -- 2
-while$ -- 9
+while$ -- 22
 width$ -- 0
-write$ -- 39
+write$ -- 80
 (There were 2 warnings)

@@ -6,7 +6,7 @@ import itertools
 
 verbose = False
 save = False
-exhaustive = False
+exhaustive = True
 # range (xrange, yrange), N is number of tasks points
 def get_random_tasks(search_range, N):
   x = np.random.random(N)*search_range[0]
@@ -70,7 +70,7 @@ def task_assignment_solver(num_seeds,max_NFE,tasks,robots,exhaustive):
   max_NFE *= num_tasks
   ft = np.zeros((num_seeds, max_NFE))
   T0 = 2 # initial temperature
-  alpha = 0.75 # cooling parameter
+  alpha = 0.95 # cooling parameter
   for seed in np.arange(num_seeds):
     np.random.seed(seed)
     # random initial tour
@@ -134,7 +134,7 @@ def task_assignment_solver(num_seeds,max_NFE,tasks,robots,exhaustive):
   # best_ind = np.unravel_index(np.argmin(np.nonzero(ft)), ft.shape)
   best_ind = np.unravel_index(np.argmin(ft), ft.shape)
   bestf = ft[best_ind]
-  # print best_ind
+  print best_ind
   bestassign = assignt[best_ind[0]]
   return best_tasks, bestf, ft, best_dist # best result of all seeds
 
@@ -155,10 +155,10 @@ def assignment_show(robots,tasks,ft):
   plt.show()
 
 # NFE to different cities
-num = 50 # tasks equal to num of robots
+num = 10 # tasks equal to num of robots
 search_range = [20,20]
 num_seeds = 10
-max_NFE = 10000
+max_NFE = 5000
 
 np.random.seed(1)
 robots =  get_random_robots(search_range,num)
